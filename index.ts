@@ -4,6 +4,7 @@ import multer from 'multer';
 import { adapter } from './bot/adapter';
 import { bot } from './bot/bot';
 import { registerConverseRoute } from './routes/converseRoute';
+import { initializeCosmosDb } from './utils/initCosmos'; // 👈 Import init
 
 const app = express();
 const upload = multer({ dest: 'uploads/' });
@@ -33,4 +34,13 @@ app.get('/api/health', (_, res) => {
 });
 
 const PORT = process.env.PORT ?? 3978;
-app.listen(PORT, () => console.log(`🚀 Bot running on port ${PORT}`));
+
+(async () => {
+  try {
+    await initializeCosmosDb(); // 👈 Ensure Cosmos DB before bot starts
+    app.listen(PORT, () => console.log(`🚀 Bot running on port ${PORT}`));
+  } catch (e) {
+    console.error('❌ App failed to start due to Cosmos DB error');
+    process.exit(1);
+  }
+})();

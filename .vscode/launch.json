@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch via Node",
+      "program": "${workspaceFolder}/dist/index.js",   // path to compiled JS
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"], // match all compiled output
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

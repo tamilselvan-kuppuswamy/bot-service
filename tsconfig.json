@@ -7,7 +7,10 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "rootDir": "./",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "sourceMap": true,                      // ✅ Required for debugging
+    "inlineSources": true,                  // ✅ Optional, helpful for VS Code
+    "noImplicitAny": false                  // Optional: useful if you're debugging type issues
   },
   "include": [
     "index.ts",

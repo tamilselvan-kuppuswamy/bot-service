@@ -26,7 +26,7 @@ export function registerConverseRoute(app: express.Express, upload: any) {
       let userText = '';
 
       if (isAudio && req.file) {
-        const allowedTypes = ['audio/m4a', 'audio/x-m4a', 'audio/mp3', 'audio/mpeg', 'audio/wav'];
+        const allowedTypes = ['audio/m4a', 'audio/x-m4a', 'audio/mp3', 'audio/mpeg', 'audio/wav','audio/wave'];
         if (!allowedTypes.includes(req.file.mimetype)) {
           logError('❌ Unsupported audio format', { userId, mimetype: req.file.mimetype });
           return res.status(400).send('Unsupported audio format.');

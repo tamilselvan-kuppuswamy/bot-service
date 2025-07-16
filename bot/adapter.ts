@@ -8,7 +8,7 @@ import {
 const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
   MicrosoftAppId: process.env.MICROSOFT_APP_ID || '',
   MicrosoftAppPassword: process.env.MICROSOFT_APP_PASSWORD || '',
-  MicrosoftAppType: 'MultiTenant'
+  MicrosoftAppType:'MultiTenant'
 });
 
 const botFrameworkAuth = new ConfigurationBotFrameworkAuthentication({}, credentialsFactory);

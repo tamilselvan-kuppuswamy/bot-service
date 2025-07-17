@@ -7,6 +7,8 @@ export const AppConfig = {
   USE_MOCK_SERVICE: process.env.USE_MOCK_SERVICE === 'true',
   USE_MOCK_DB: process.env.USE_MOCK_DB === 'true',
   STT_TIMEOUT: parseInt(process.env.STT_TIMEOUT || '5000', 10),
+  RETURN_AUDIO: process.env.RETURN_AUDIO === 'true', // ✅ NEW
+
 
   // Azure Bot credentials
   MICROSOFT_APP_ID: process.env.MICROSOFT_APP_ID || '',

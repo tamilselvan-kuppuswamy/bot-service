@@ -10,9 +10,12 @@ export function sendMultipartResponse(res: Response, text: string, audio: string
     return res.json({ text, audioUrl: audio });
   }
 
-  // ✅ Case 2: audio is a Buffer → send multipart
-  if (!Buffer.isBuffer(audio)) {
-    return res.status(500).json({ text, error: 'Invalid audio format in response.' });
+  // ✅ Case 2: audio must be a Buffer
+  if (!Buffer.isBuffer(audio) || !audio.length) {
+    return res.status(500).json({
+      text,
+      error: 'Invalid or empty audio buffer in response.'
+    });
   }
 
   const boundary = '----Boundary' + Math.random().toString(36).substr(2, 9);
@@ -29,6 +32,10 @@ export function sendMultipartResponse(res: Response, text: string, audio: string
     `Content-Type: audio/mpeg\r\n\r\n`;
 
   const endBoundary = `\r\n--${boundary}--\r\n`;
+
+  // (Optional) total length for streaming clients — uncomment if needed
+  // const totalLength = Buffer.byteLength(textPart + audioHeader + endBoundary) + audio.length;
+  // res.setHeader('Content-Length', totalLength);
 
   res.write(textPart);
   res.write(audioHeader);

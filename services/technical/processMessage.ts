@@ -5,6 +5,7 @@ import { Messages } from '../../utils/messages';
 import { isYes, isNo } from '../../utils/confirmationUtils';
 import { stripEmojis } from '../../utils/ttsUtils';
 import { logInfo, logError } from '../../utils/logger';
+import { AppConfig } from '../../config/config'; // ✅ added import
 
 export async function processMessage(
   userId: string,
@@ -33,7 +34,6 @@ export async function processMessage(
 
   logInfo('User message received', { userId, text: userText });
 
-  // 🔄 Step 1: Confirmation Handling
   if (userState.awaitingConfirmation) {
     const confirm = await Technical.detectIntent(userText);
     const confirmation = userText.trim().toLowerCase();
@@ -85,15 +85,14 @@ export async function processMessage(
     }
 
     await conversationState.saveChanges(dummyContext as any);
-    const audioReply = await Technical.synthesizeSpeech(stripEmojis(textReply), true);
+    const audioReply = await Technical.synthesizeSpeech(stripEmojis(textReply), AppConfig.RETURN_AUDIO); // ✅ changed
     return { textReply, audioReply };
   }
 
-  // 🔍 Step 2: Intent Detection
   const intentResult = await Technical.detectIntent(userText);
   if (!intentResult.intent || intentResult.intent === 'Unknown' || intentResult.confidence < 60) {
     const fallback = Messages.Fallback;
-    const audio = await Technical.synthesizeSpeech(stripEmojis(fallback), true);
+    const audio = await Technical.synthesizeSpeech(stripEmojis(fallback), AppConfig.RETURN_AUDIO); // ✅ changed
     logError('Unknown/low confidence intent', {
       userId,
       intent: intentResult.intent,
@@ -154,6 +153,6 @@ export async function processMessage(
   }
 
   await conversationState.saveChanges(dummyContext as any);
-  const audioReply = await Technical.synthesizeSpeech(stripEmojis(textReply), true);
+  const audioReply = await Technical.synthesizeSpeech(stripEmojis(textReply), AppConfig.RETURN_AUDIO); // ✅ changed
   return { textReply, audioReply };
 }

@@ -40,28 +40,47 @@ export function registerConverseRoute(app: express.Express, upload: any) {
         logInfo('Received typed text', { userId, userText });
       }
 
-      if (!userText?.trim()) {
-        const fallback = 'Sorry, I could not hear anything.';
-        const { textReply, audioReply } = await processMessage(userId, fallback, conversationId);
-        if (typeof audioReply === 'string') {
-          return res.json({ text: textReply, audioUrl: audioReply });
-        }
-        return sendMultipartResponse(res, textReply, audioReply);
+      const isEmpty = !userText?.trim();
+      const { textReply, audioReply } = await processMessage(
+        userId,
+        isEmpty ? 'Sorry, I could not hear anything.' : userText,
+        conversationId
+      );
+
+      // ✅ Audio toggle logic
+      if (!AppConfig.RETURN_AUDIO) {
+        return res.json({ text: textReply });
       }
 
-      const { textReply, audioReply } = await processMessage(userId, userText, conversationId);
-      if (typeof audioReply === 'string') {
+      if (Buffer.isBuffer(audioReply)) {
+        if (!audioReply || audioReply.length === 0) {
+          logError('❌ Empty or invalid audio buffer', { userId });
+          return res.json({ text: textReply });
+        }
+        return sendMultipartResponse(res, textReply, audioReply);
+      } else if (typeof audioReply === 'string') {
         return res.json({ text: textReply, audioUrl: audioReply });
+      } else {
+        logError('⚠️ Invalid audioReply type', { userId, audioReply });
+        return res.json({ text: textReply });
       }
-      return sendMultipartResponse(res, textReply, audioReply);
     } catch (err: any) {
       logError('Error in /api/converse', { userId, error: err.message });
+
       const fallback = 'Something went wrong. Please try again later.';
       const { textReply, audioReply } = await processMessage(userId, fallback, conversationId);
-      if (typeof audioReply === 'string') {
-        return res.json({ text: textReply, audioUrl: audioReply });
+
+      if (!AppConfig.RETURN_AUDIO) {
+        return res.json({ text: textReply });
       }
-      return sendMultipartResponse(res, textReply, audioReply);
+
+      if (Buffer.isBuffer(audioReply)) {
+        return sendMultipartResponse(res, textReply, audioReply);
+      } else if (typeof audioReply === 'string') {
+        return res.json({ text: textReply, audioUrl: audioReply });
+      } else {
+        return res.json({ text: textReply });
+      }
     } finally {
       if (req.file?.path) {
         fs.unlink(req.file.path, (err) => {
